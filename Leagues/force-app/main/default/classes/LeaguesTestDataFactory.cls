@@ -77,7 +77,7 @@ public class LeaguesTestDataFactory {
         return lstTeams;
     }
 
-    public static Id getSeasonGameRecordTypeId(String developerName) {
+    public static Id getLeagueGameRecordTypeId(String developerName) {
         if (mapDevNamesToRecTypeIds != null) {
             return mapDevNamesToRecTypeIds.get(developerName);
         }

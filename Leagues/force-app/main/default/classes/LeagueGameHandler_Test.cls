@@ -7,7 +7,7 @@ public class LeagueGameHandler_Test {
         List<Team__c> lstTeams = LeaguesTestDataFactory.createTeams(lstLeagueSeasons, 2);
 
         League_Game__c game = new League_Game__c(
-            RecordTypeId = LeaguesTestDataFactory.getSeasonGameRecordTypeId('Soccer'),
+            RecordTypeId = LeaguesTestDataFactory.getLeagueGameRecordTypeId('Soccer'),
             Home_Team__c = lstTeams[0].Id,
             Away_Team__c = lstTeams[1].Id,
             Game_Time__c = Datetime.now().addDays(1)
