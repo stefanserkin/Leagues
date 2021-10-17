@@ -5,7 +5,7 @@ public class LeaguesTestDataFactory {
 
     public static List<League_Season__c> createLeagueSeasons(
         String sport,
-        String teamRankingsType,
+        String leagueRankingType,
         Integer numLeagues, 
         Integer numLeagueSeasons
     ) {
@@ -17,14 +17,17 @@ public class LeaguesTestDataFactory {
         List<League_Season__c> lstLeagueSeasons = new List<League_Season__c>();
         for (League__c league : lstLeagues) {
             for (Integer i = 0; i < numLeagueSeasons; i++) {
-                lstLeagueSeasons.add(
-                    new League_Season__c(
-                        League__c = league.Id, 
-                        Team_Rankings_Type__c = teamRankingsType, 
-                        Start_Date__c = Date.today().addDays(-30).addYears(-i), 
-                        End_Date__c = Date.today().addDays(30).addYears(-i)
-                    )
-                );
+                League_Season__c ls = new League_Season__c();
+                ls.League__c = league.Id;
+                ls.League_Ranking_Type__c = leagueRankingType;
+                ls.Start_Date__c = Date.today().addDays(-30).addYears(-i);
+                ls.End_Date__c = Date.today().addDays(30).addYears(-i);
+                if (leagueRankingType == 'Points System') {
+                    System.debug('Should be adding config');
+                    Standings_Configuration__c sc = createConfig();
+                    ls.Standings_Configuration__c = sc.Id;
+                }
+                lstLeagueSeasons.add(ls);
             }
         }
         insert lstLeagueSeasons;
@@ -33,7 +36,7 @@ public class LeaguesTestDataFactory {
 
     public static List<League_Season__c> createLeagueSeasons(
         String sport,
-        String teamRankingsType,
+        String leagueRankingType,
         Integer numLeagues, 
         Integer numLeagueSeasons,
         Decimal minAge, 
@@ -47,18 +50,30 @@ public class LeaguesTestDataFactory {
         List<League_Season__c> lstLeagueSeasons = new List<League_Season__c>();
         for (League__c league : lstLeagues) {
             for (Integer i = 0; i < numLeagueSeasons; i++) {
-                lstLeagueSeasons.add(
-                    new League_Season__c(
-                        League__c = league.Id, 
-                        Team_Rankings_Type__c = teamRankingsType, 
-                        Start_Date__c = Date.today().addDays(-30).addYears(-i), 
-                        End_Date__c = Date.today().addDays(30).addYears(-i)
-                    )
-                );
+                League_Season__c ls = new League_Season__c();
+                ls.League__c = league.Id;
+                ls.League_Ranking_Type__c = leagueRankingType;
+                ls.Start_Date__c = Date.today().addDays(-30).addYears(-i);
+                ls.End_Date__c = Date.today().addDays(30).addYears(-i);
+                if (leagueRankingType == 'Points System') {
+                    System.debug('Should be adding config');
+                    Standings_Configuration__c sc = createConfig();
+                    ls.Standings_Configuration__c = sc.Id;
+                }
+                lstLeagueSeasons.add(ls);
             }
         }
         insert lstLeagueSeasons;
         return lstLeagueSeasons;
+    }
+
+    private static Standings_Configuration__c createConfig() {
+        Standings_Configuration__c sc = new Standings_Configuration__c();
+        sc.Points_Per_Win__c  = 3;
+        sc.Points_Per_Loss__c = 0;
+        sc.Points_Per_Tie__c  = 1;
+        insert sc;
+        return sc;
     }
 
     public static List<Team__c> createTeams(
