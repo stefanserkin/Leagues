@@ -80,7 +80,8 @@ public class LeagueGameHandler_Test {
     static void testPointsSystemConfig() {
         List<League_Season__c> lstLeagueSeasons = LeaguesTestDataFactory.createLeagueSeasons('Soccer', 'Points System', 1, 1);
         List<Team__c> lstTeams = LeaguesTestDataFactory.createTeams(lstLeagueSeasons, 2);
-
+        System.debug('lstTeams size is ' + lstTeams.size());
+        System.debug('lstTeams home is ' + lstTeams[0].Id);
         League_Game__c game = new League_Game__c(
             RecordTypeId = LeaguesTestDataFactory.getLeagueGameRecordTypeId('Soccer'),
             Home_Team__c = lstTeams[0].Id,

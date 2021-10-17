@@ -24,6 +24,10 @@ public with sharing class LeagueGameHandler {
             if (String.isBlank(game.Status__c)) {
                 game.Status__c = getStatus(game);
             }
+            if (game.League_Season__c == null) {
+                System.debug('League season id is ' + getLeagueSeasonId(game.Home_Team__c));
+                game.League_Season__c = getLeagueSeasonId(game.Home_Team__c);
+            }
         }
     }
 
@@ -78,7 +82,7 @@ public with sharing class LeagueGameHandler {
         }
         // Otherwise, load map and return team name for id
         mapTeamCache = new Map<Id, Team__c>([
-            SELECT Id, Name
+            SELECT Id, Name, League_Season__c
               FROM Team__c
              LIMIT 10000
         ]);
@@ -94,6 +98,22 @@ public with sharing class LeagueGameHandler {
             strStatus = 'Results Pending';
         }
         return strStatus;
+    }
+
+    private static String getLeagueSeasonId(Id teamId) {
+        String strSeasonId = '';
+        if (mapTeamCache != null) {
+            strSeasonId = mapTeamCache.get(teamId).League_Season__c;
+            return strSeasonId;
+        }
+        // Otherwise, load map and return team name for id
+        mapTeamCache = new Map<Id, Team__c>([
+            SELECT Id, Name, League_Season__c
+              FROM Team__c
+             LIMIT 10000
+        ]);
+        strSeasonId = mapTeamCache.get(teamId).League_Season__c;
+        return strSeasonId;
     }
 
     private static void recalcTeamRecords(Set<Id> setTeamIds) {
