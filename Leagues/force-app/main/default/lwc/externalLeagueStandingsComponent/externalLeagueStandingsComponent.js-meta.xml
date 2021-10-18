@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>52.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>League Season Standings</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property 
+                label="League Season ID" 
+                name="leagueSeasonId" 
+                type="String"
+            />
+            <property 
+                label="Show Team Logos" 
+                name="showTeamLogos" 
+                type="Boolean" 
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,13 @@
+<template>
+    <lightning-card title={cardTitle}>
+        <template if:true={teams}>
+            <c-league-season-datatable
+                key-field="Id"
+                data={teams}
+                columns={cols}
+                column-widths-mode="auto"
+                hide-checkbox-column
+            ></c-league-season-datatable>
+        </template>
+    </lightning-card>
+</template>

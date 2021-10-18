@@ -1,0 +1,14 @@
+<template>
+    <lightning-card title={cardTitle}>
+        <h3 class="slds-text-heading_small slds-var-m-around_medium">{leagueDateRange}</h3>
+        <template if:true={teams}>
+            <c-league-season-datatable
+                key-field="Id"
+                data={teams}
+                columns={cols}
+                column-widths-mode="auto"
+                hide-checkbox-column
+            ></c-league-season-datatable>
+        </template>
+    </lightning-card>
+</template>

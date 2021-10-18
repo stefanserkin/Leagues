@@ -1,0 +1,38 @@
+<template>
+    <lightning-tabset variant="vertical" active-tab-value="Soccer">
+
+        <lightning-tab label="Soccer" value="Soccer" onactive={handleActive}>
+            <div class="slds-var-m-around_medium">
+                <div class="slds-align_absolute-center slds-var-m-around_medium">
+                    <lightning-combobox
+                        name="LeagueSeason"
+                        label="League Season"
+                        placeholder="Select Season"
+                        value={leagueSeasonChoice}
+                        onchange={handleLeagueSeasonChange}
+                        options={leagueSeasonOptionValues}
+                        style="width:500px">
+                    </lightning-combobox>
+                </div>
+                <c-league-season-standings
+                    league-season-id={selectedLeagueSeason}
+                    show-team-logos={showTeamLogos}
+                ></c-league-season-standings>
+            </div>
+            Soccer Content !
+        </lightning-tab>
+
+        <lightning-tab label="Baseball" value="Baseball" onactive={handleActive}>
+            <template if:true={leagueSeasons}>
+                Baseball Content !
+            </template>
+        </lightning-tab>
+
+        <lightning-tab label="Basketball">
+            <template if:true={leagueSeasons}>
+                Basketball Content !
+            </template>
+        </lightning-tab>
+
+    </lightning-tabset>
+</template>
