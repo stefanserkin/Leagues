@@ -23,12 +23,46 @@
         </lightning-tab>
 
         <lightning-tab label="Baseball" value="Baseball" onactive={handleActive}>
+            <div class="slds-var-m-around_medium">
+                <div class="slds-align_absolute-center slds-var-m-around_medium">
+                    <lightning-combobox
+                        name="LeagueSeason"
+                        label="League Season"
+                        placeholder="Select Season"
+                        value={leagueSeasonChoice}
+                        onchange={handleLeagueSeasonChange}
+                        options={leagueSeasonOptionValues}
+                        style="width:500px">
+                    </lightning-combobox>
+                </div>
+                <c-league-season-standings
+                    league-season-id={selectedLeagueSeason}
+                    show-team-logos={showTeamLogos}
+                ></c-league-season-standings>
+            </div>
             <template if:true={leagueSeasons}>
                 Baseball Content !
             </template>
         </lightning-tab>
 
         <lightning-tab label="Basketball">
+            <div class="slds-var-m-around_medium">
+                <div class="slds-align_absolute-center slds-var-m-around_medium">
+                    <lightning-combobox
+                        name="LeagueSeason"
+                        label="League Season"
+                        placeholder="Select Season"
+                        value={leagueSeasonChoice}
+                        onchange={handleLeagueSeasonChange}
+                        options={leagueSeasonOptionValues}
+                        style="width:500px">
+                    </lightning-combobox>
+                </div>
+                <c-league-season-standings
+                    league-season-id={selectedLeagueSeason}
+                    show-team-logos={showTeamLogos}
+                ></c-league-season-standings>
+            </div>
             <template if:true={leagueSeasons}>
                 Basketball Content !
             </template>

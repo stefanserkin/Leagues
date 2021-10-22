@@ -7,6 +7,7 @@ import getTeams from '@salesforce/apex/LeagueSeasonStandingsController.getTeams'
 import LEAGUE_NAME_FIELD from '@salesforce/schema/League_Season__c.League_Name__c';
 import START_DATE_FIELD from '@salesforce/schema/League_Season__c.Start_Date__c';
 import END_DATE_FIELD from '@salesforce/schema/League_Season__c.End_Date__c';
+import LEAGUE_RANKING_TYPE_FIELD from '@salesforce/schema/League_Season__c.League_Ranking_Type__c';
 
 const COLS = [
     { label: '', fieldName: 'teamLogo', type: 'image', initialWidth: 32 },
@@ -47,6 +48,45 @@ const COLS_NO_LOGOS = [
     }
 ];
 
+const COLS_WIN_PERC = [
+    { label: '', fieldName: 'teamLogo', type: 'image', initialWidth: 32 },
+    { label: 'Team', fieldName: 'teamUrl', type: 'url', 
+        typeAttributes: {
+            label: { fieldName: 'teamName' }
+        }, 
+        sortable: true
+    },
+    { label: 'Games Played', fieldName: 'Games_Played__c', type: 'number' },
+    { label: 'Wins', fieldName: 'Wins__c', type: 'number' },
+    { label: 'Losses', fieldName: 'Losses__c', type: 'number' },
+    { label: 'Ties', fieldName: 'Ties__c', type: 'number' },
+    { label: 'W-L%', fieldName: 'winPer',
+        cellAttributes: {
+            class: { fieldName:'pointsColumnColor' },
+            alignment: 'center'
+        }
+    }
+];
+
+const COLS_WIN_PERC_NO_LOGOS = [
+    { label: 'Team', fieldName: 'teamUrl', type: 'url', 
+        typeAttributes: {
+            label: { fieldName: 'teamName' }
+        }, 
+        sortable: true
+    },
+    { label: 'Games Played', fieldName: 'Games_Played__c', type: 'number' },
+    { label: 'Wins', fieldName: 'Wins__c', type: 'number' },
+    { label: 'Losses', fieldName: 'Losses__c', type: 'number' },
+    { label: 'Ties', fieldName: 'Ties__c', type: 'number' },
+    { label: 'W-L%', fieldName: 'winPer',
+        cellAttributes: {
+            class: { fieldName:'pointsColumnColor' },
+            alignment: 'center'
+        }
+    }
+];
+
 export default class LeagueSeasonStandings extends LightningElement {
     @api showTeamLogos;
     @api leagueSeasonId;
@@ -57,24 +97,56 @@ export default class LeagueSeasonStandings extends LightningElement {
     get cardTitle() {
         return `${this.leagueName} Standings`;
     }
-    get leagueDateRange() {
-        return `${this.leagueStartDate} - ${this.leagueEndDate}`;
+
+    get leagueStartDateFormatted() {
+        return this.formatDate(this.leagueStartDate);
+    }
+
+    get leagueEndDateFormatted() {
+        return this.formatDate(this.leagueEndDate);
+    }
+
+    formatDate(stringDate) {
+        let initStringDate = stringDate;
+        if ((typeof initStringDate == 'undefined') || (initStringDate == null) || (initStringDate.length <= 0)) {
+            return '';
+        }
+        let year = initStringDate.substring(0, 4);
+        let month = initStringDate.substring(5, 7);
+        let day = initStringDate.substring(8, 10);
+        return month + '/' + day + '/' + year;
     }
 
     wiredTeamsResult;
     teams = [];
     
     get cols() {
-        return this.showTeamLogos ? COLS : COLS_NO_LOGOS;
+        let tempCols = [];
+        if (this.showTeamLogos) {
+            if (this.leagueRankingType == 'Points System') {
+                tempCols = COLS;
+            } else {
+                tempCols = COLS_WIN_PERC;
+                console.table(tempCols);
+            }
+        } else {
+            if (this.leagueRankingType == 'Points System') {
+                tempCols = COLS_NO_LOGOS;
+            } else {
+                tempCols = COLS_WIN_PERC_NO_LOGOS;
+            }
+        }
+        return tempCols;
     }
 
     leagueName;
     leagueStartDate;
     leagueEndDate;
+    leagueRankingType;
 
     @wire(getRecord, {
         recordId: '$leagueSeasonId',
-        fields: [LEAGUE_NAME_FIELD, START_DATE_FIELD, END_DATE_FIELD]
+        fields: [LEAGUE_NAME_FIELD, START_DATE_FIELD, END_DATE_FIELD, LEAGUE_RANKING_TYPE_FIELD]
     }) wireuser({
         error,
         data
@@ -85,11 +157,15 @@ export default class LeagueSeasonStandings extends LightningElement {
             this.leagueName = data.fields.League_Name__c.value;
             this.leagueStartDate = data.fields.Start_Date__c.value;
             this.leagueEndDate = data.fields.End_Date__c.value;
+            console.log(typeof this.leagueEndDate);
+            this.leagueRankingType = data.fields.League_Ranking_Type__c.value;
+            this.isLoading = false;
         }
     }
 
-    @wire(getTeams, { recordId : '$leagueSeasonId' })
+    @wire(getTeams, { recordId : '$leagueSeasonId', leagueRankingType : '$leagueRankingType' })
     wiredTeams(result) {
+        console.log('this.leagueRankingType: ' + this.leagueRankingType);
         this.wiredTeamsResult = result;
         const { data, error } = result;
         if (error) {
@@ -102,6 +178,7 @@ export default class LeagueSeasonStandings extends LightningElement {
             let teamLogo;
             let parsedTeamsData = JSON.parse(JSON.stringify(result.data));
             parsedTeamsData = parsedTeamsData.map(row => {
+                console.log(row.Winning_Percentage__c);
                 teamUrl = `/${row.Id}`;
                 if (row.Team_Logo_URL__c) {
                     teamLogo = row.Team_Logo_URL__c;
@@ -109,6 +186,7 @@ export default class LeagueSeasonStandings extends LightningElement {
                     teamLogo = 'https://asphaltgreen--leagues--c.documentforce.com/servlet/servlet.ImageServer?id=01503000000I3SK&oid=00D030000008pAs&lastMod=1634498460000';
                 }
                 return {...row, 
+                    'winPer':row.Winning_Percentage__c,
                     'teamName':row.Name,
                     'teamUrl':teamUrl,
                     'pointsColumnColor':'datatable-shading',

@@ -25,7 +25,6 @@ public with sharing class LeagueGameHandler {
                 game.Status__c = getStatus(game);
             }
             if (game.League_Season__c == null) {
-                System.debug('League season id is ' + getLeagueSeasonId(game.Home_Team__c));
                 game.League_Season__c = getLeagueSeasonId(game.Home_Team__c);
             }
         }
@@ -68,7 +67,7 @@ public with sharing class LeagueGameHandler {
     private static String getSeasonGameName(League_Game__c game) {
         String strHomeTeamName = getTeamName(game.Home_Team__c);
         String strAwayTeamName = getTeamName(game.Away_Team__c);
-        String strGameTime     = game.Game_Time__c.format('MM/dd/yyyy HH:mm:ss', 'America/New_York');
+        String strGameTime     = game.Game_Time__c.format();
         String strGameName     = strAwayTeamName + ' at ' + strHomeTeamName + ' - ' + strGameTime;
         return strGameName;
     }

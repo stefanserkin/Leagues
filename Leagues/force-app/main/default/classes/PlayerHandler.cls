@@ -29,8 +29,13 @@ public with sharing class PlayerHandler {
     }
 
     private static Boolean isDuplicateNumberForTeam(Decimal uniNumber, Id teamId) {
-        Map<Decimal, String> mapInvestigation = mapTeamsToTakenNumbers.get(teamId);
-        Boolean numberIsDuplicate = mapTeamsToTakenNumbers.get(teamId).containsKey(uniNumber);
+        Boolean numberIsDuplicate = false;
+        System.debug(':::: uniNumber is ' + uniNumber);
+        System.debug(':::: teamId is ' + teamId);
+        System.debug(':::: map is ' + mapTeamsToTakenNumbers.get(teamId));
+        if (mapTeamsToTakenNumbers.get(teamId) != null) {
+            numberIsDuplicate = mapTeamsToTakenNumbers.get(teamId)?.containsKey(uniNumber);
+        }
         return numberIsDuplicate;
     }
 

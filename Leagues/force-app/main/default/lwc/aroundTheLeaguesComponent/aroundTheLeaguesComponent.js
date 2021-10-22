@@ -1,4 +1,5 @@
 import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import getLeagueSeasons from '@salesforce/apex/LeagueSeasonStandingsController.getLeagueSeasons';
 
 export default class AroundTheLeaguesComponent extends LightningElement {
@@ -35,6 +36,8 @@ export default class AroundTheLeaguesComponent extends LightningElement {
             }
             
             this.error = undefined;
+
+            refreshApex(this.wiredLeagueSeasonsResult);
             this.isLoading = false;
         } else if (error) {
             this.leagueSeasons = undefined;
