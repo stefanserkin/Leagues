@@ -6,7 +6,6 @@ export default class AroundTheLeaguesComponent extends LightningElement {
     @api showTeamLogos;
     isLoading = true;
 
-    // SCANNING LOCATIONS
     wiredLeagueSeasonsResult;
     leagueSeasons = [];
 

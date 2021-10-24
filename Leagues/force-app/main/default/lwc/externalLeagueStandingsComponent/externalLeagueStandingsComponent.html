@@ -1,13 +1,23 @@
 <template>
     <lightning-card title={cardTitle}>
-        <template if:true={teams}>
-            <c-league-season-datatable
-                key-field="Id"
-                data={teams}
-                columns={cols}
-                column-widths-mode="auto"
-                hide-checkbox-column
-            ></c-league-season-datatable>
-        </template>
+        <div class="slds-var-m-around_medium">
+            <lightning-combobox
+                name="LeagueSeason"
+                slot="actions"
+                label="League Season"
+                placeholder="Select Season"
+                value={leagueSeasonChoice}
+                onchange={handleLeagueSeasonChange}
+                options={leagueSeasonOptionValues}
+                class="slds-var-m-around_medium"
+                style="width:500px">
+            </lightning-combobox>
+            <template if:true={selectedLeagueSeason}>
+                <c-league-season-standings
+                    league-season-id={selectedLeagueSeason}
+                    show-team-logos={showTeamLogos}
+                ></c-league-season-standings>
+            </template>
+        </div>
     </lightning-card>
 </template>

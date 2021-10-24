@@ -1,11 +1,8 @@
 import { LightningElement, api, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
-import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import { getRecord } from 'lightning/uiRecordApi';
 import STYLES from '@salesforce/resourceUrl/LeagueStandingsStyles';
 import getTeams from '@salesforce/apex/LeagueSeasonStandingsController.getTeams';
-import DEFAULT_LOGO_ICON from '@salesforce/resourceUrl/leaguesDefaultLogo';
 
 import LEAGUE_SEASON_NAME_FIELD from '@salesforce/schema/League_Season__c.Name';
 import START_DATE_FIELD from '@salesforce/schema/League_Season__c.Start_Date__c';
@@ -90,14 +87,12 @@ const COLS_WIN_PERC_NO_LOGOS = [
     }
 ];
 
-export default class LeagueSeasonStandings extends NavigationMixin(LightningElement) {
+export default class LeagueSeasonStandings extends LightningElement {
     @api showTeamLogos;
     @api leagueSeasonId;
     isLoading = true;
     isCssLoaded = false;
     error;
-
-    defaultTeamLogo = DEFAULT_LOGO_ICON;
 
     get cardTitle() {
         return `${this.leagueSeasonName} Standings`;
@@ -132,7 +127,6 @@ export default class LeagueSeasonStandings extends NavigationMixin(LightningElem
                 tempCols = COLS;
             } else {
                 tempCols = COLS_WIN_PERC;
-                console.table(tempCols);
             }
         } else {
             if (this.leagueRankingType == 'Points System') {
@@ -169,7 +163,6 @@ export default class LeagueSeasonStandings extends NavigationMixin(LightningElem
 
     @wire(getTeams, { recordId : '$leagueSeasonId', leagueRankingType : '$leagueRankingType' })
     wiredTeams(result) {
-        console.log('this.leagueRankingType: ' + this.leagueRankingType);
         this.wiredTeamsResult = result;
         const { data, error } = result;
         if (error) {

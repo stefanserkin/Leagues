@@ -10,14 +10,14 @@
     <targetConfigs>
         <targetConfig targets="lightningCommunity__Default">
             <property 
-                label="League Season ID" 
-                name="leagueSeasonId" 
-                type="String"
-            />
-            <property 
                 label="Show Team Logos" 
                 name="showTeamLogos" 
                 type="Boolean" 
+            />
+            <property 
+                label="Sport" 
+                name="sport" 
+                type="String" 
             />
         </targetConfig>
     </targetConfigs>

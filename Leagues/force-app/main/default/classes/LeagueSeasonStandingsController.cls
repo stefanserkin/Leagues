@@ -29,7 +29,7 @@ public with sharing class LeagueSeasonStandingsController {
                   FROM League_Season__c 
                  WHERE Sport__c = :sport
                   WITH SECURITY_ENFORCED 
-                 ORDER BY Start_Date__c DESC
+                 ORDER BY Maximum_Age__c DESC NULLS last, Minimum_Age__c DESC NULLS last
                  LIMIT 10000];
     }
     

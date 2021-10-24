@@ -13,17 +13,13 @@ public with sharing class LeaguesParseFlowInput {
     }
 
     public class ParseRequest {
-
         @InvocableVariable(required=true)
         public String input;
-    
     }
     
     public class ParseResult {
-    
         @InvocableVariable
         public List<String> output;
-    
     }
 
 }
