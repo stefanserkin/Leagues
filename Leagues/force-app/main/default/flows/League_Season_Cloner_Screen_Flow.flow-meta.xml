@@ -222,13 +222,6 @@
             </value>
         </filters>
         <filters>
-            <field>Minimum_Age__c</field>
-            <operator>GreaterThanOrEqualTo</operator>
-            <value>
-                <elementReference>Get_League_Season.League__r.Minimum_Age__c</elementReference>
-            </value>
-        </filters>
-        <filters>
             <field>Id</field>
             <operator>NotEqualTo</operator>
             <value>
@@ -241,7 +234,7 @@
             <assignToReference>leagueId</assignToReference>
             <field>Id</field>
         </outputAssignments>
-        <sortField>Minimum_Age__c</sortField>
+        <sortField>Name</sortField>
         <sortOrder>Asc</sortOrder>
         <valueField>Id</valueField>
     </dynamicChoiceSets>

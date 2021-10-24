@@ -1,6 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <actionCalls>
+        <name>Get_List_of_Team_Names</name>
+        <label>Get List of Team Names</label>
+        <locationX>248</locationX>
+        <locationY>2822</locationY>
+        <actionName>LeaguesParseFlowInput</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Loop_through_Team_Names</targetReference>
+        </connector>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>input</name>
+            <value>
+                <elementReference>Input_Team_Names_Text_Area</elementReference>
+            </value>
+        </inputParameters>
+        <outputParameters>
+            <assignToReference>lstTeamNames</assignToReference>
+            <name>output</name>
+        </outputParameters>
+    </actionCalls>
     <apiVersion>53.0</apiVersion>
+    <assignments>
+        <name>Add_Team_to_List_to_Insert</name>
+        <label>Add Team to List to Insert</label>
+        <locationX>336</locationX>
+        <locationY>3182</locationY>
+        <assignmentItems>
+            <assignToReference>lstTeamsToInsert</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>team</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_through_Team_Names</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Convert_Text_Area_to_Basic_String</name>
+        <label>Convert Text Area to Basic String</label>
+        <locationX>380</locationX>
+        <locationY>2582</locationY>
+        <assignmentItems>
+            <assignToReference>strUnseparatedNames</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Input_Team_Names_Text_Area</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Check_League_Names_Input</targetReference>
+        </connector>
+    </assignments>
     <assignments>
         <name>New_Standings_Config</name>
         <label>New Standings Config</label>
@@ -35,7 +89,7 @@
         <name>Set_League_Details</name>
         <label>Set League Details</label>
         <locationX>380</locationX>
-        <locationY>1766</locationY>
+        <locationY>2342</locationY>
         <assignmentItems>
             <assignToReference>leagueSeason.League__c</assignToReference>
             <operator>Assign</operator>
@@ -57,6 +111,20 @@
                 <elementReference>Input_Ranking_Type_Picklist</elementReference>
             </value>
         </assignmentItems>
+        <assignmentItems>
+            <assignToReference>leagueSeason.Season__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Input_Season_Picklist</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>leagueSeason.Public_Calendar__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>publicCalendarId</elementReference>
+            </value>
+        </assignmentItems>
         <connector>
             <targetReference>Insert_League_Season</targetReference>
         </connector>
@@ -74,7 +142,7 @@
             </value>
         </assignmentItems>
         <connector>
-            <targetReference>Set_League_Details</targetReference>
+            <targetReference>Check_Public_Calendar_Selection</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -87,6 +155,54 @@
             <operator>Assign</operator>
             <value>
                 <elementReference>strLeagueStandingsAutoName</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Check_Public_Calendar_Selection</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Public_Calendar</name>
+        <label>Set Public Calendar</label>
+        <locationX>248</locationX>
+        <locationY>1886</locationY>
+        <assignmentItems>
+            <assignToReference>publicCalendar.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>strLeagueStandingsName</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Insert_Public_Calendar</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Public_Calendar_Id</name>
+        <label>Set Public Calendar Id</label>
+        <locationX>248</locationX>
+        <locationY>2126</locationY>
+        <assignmentItems>
+            <assignToReference>publicCalendarId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>publicCalendar.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Set_League_Details</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Public_Calendar_Id_0</name>
+        <label>Set Public Calendar Id</label>
+        <locationX>512</locationX>
+        <locationY>1886</locationY>
+        <assignmentItems>
+            <assignToReference>publicCalendarId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Input_Public_Calendar_Lookup.recordId</elementReference>
             </value>
         </assignmentItems>
         <connector>
@@ -125,6 +241,82 @@
             <targetReference>Check_Naming_Preference</targetReference>
         </connector>
     </assignments>
+    <assignments>
+        <name>Set_Team_Values</name>
+        <label>Set Team Values</label>
+        <locationX>336</locationX>
+        <locationY>3062</locationY>
+        <assignmentItems>
+            <assignToReference>team.Name</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_through_Team_Names</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>team.League_Season__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>leagueSeason.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>team.Games_Played__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>team.Wins__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>team.Losses__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>team.Ties__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>0.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Add_Team_to_List_to_Insert</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_League_Names_Input</name>
+        <label>Check League Names Input</label>
+        <locationX>380</locationX>
+        <locationY>2702</locationY>
+        <defaultConnector>
+            <targetReference>Confirmation_Screen</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Do Not Create Teams</defaultConnectorLabel>
+        <rules>
+            <name>Create_Teams_Decision</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>unseparatedNamesIsBlank</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_List_of_Team_Names</targetReference>
+            </connector>
+            <label>Create Teams</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Check_Naming_Preference</name>
         <label>Check Naming Preference</label>
@@ -148,6 +340,31 @@
                 <targetReference>Set_Name_to_Manual_Entry_Name</targetReference>
             </connector>
             <label>Override System Naming</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Public_Calendar_Selection</name>
+        <label>Check Public Calendar Selection</label>
+        <locationX>380</locationX>
+        <locationY>1766</locationY>
+        <defaultConnector>
+            <targetReference>Set_Public_Calendar_Id_0</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Use Existing Calendar</defaultConnectorLabel>
+        <rules>
+            <name>Create_Public_Calendar</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Input_Public_Calendar_Toggle.value</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Public_Calendar</targetReference>
+            </connector>
+            <label>Create Public Calendar</label>
         </rules>
     </decisions>
     <decisions>
@@ -233,17 +450,53 @@
         <picklistField>League_Ranking_Type__c</picklistField>
         <picklistObject>League_Season__c</picklistObject>
     </dynamicChoiceSets>
+    <dynamicChoiceSets>
+        <name>pickChoiceSeasons</name>
+        <dataType>Picklist</dataType>
+        <displayField xsi:nil="true"/>
+        <object xsi:nil="true"/>
+        <picklistField>Season__c</picklistField>
+        <picklistObject>League_Season__c</picklistObject>
+    </dynamicChoiceSets>
+    <formulas>
+        <name>strAutoNameAgeGroup</name>
+        <dataType>String</dataType>
+        <expression>IF( !ISBLANK( {!leagueSeason.Maximum_Age__c} ) ,
+  &quot;U&quot; + TEXT( FLOOR( {!leagueSeason.Maximum_Age__c} ) + 1 ),
+ &quot;&quot;
+)</expression>
+    </formulas>
     <formulas>
         <name>strLeagueStandingsAutoName</name>
         <dataType>String</dataType>
-        <expression>{!Get_League.Name} + &quot; &quot; + IF(
+        <expression>{!Get_League.Name} + &quot; &quot; + {!strAutoNameAgeGroup} + &quot; &quot; + 
+ IF(
   YEAR( {!leagueSeason.Start_Date__c} ) = YEAR( {!leagueSeason.End_Date__c} ) ,
   TEXT( YEAR( {!leagueSeason.End_Date__c} ) ) ,
   TEXT( YEAR( {!leagueSeason.Start_Date__c} ) ) + &quot;-&quot; + TEXT( YEAR( {!leagueSeason.End_Date__c} ) )
 )</expression>
     </formulas>
+    <formulas>
+        <name>unseparatedNamesIsBlank</name>
+        <dataType>Boolean</dataType>
+        <expression>IF ( ISBLANK( {!strUnseparatedNames} ), TRUE, FALSE )</expression>
+    </formulas>
     <interviewLabel>League New Season Screen Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <label>League New Season Screen Flow</label>
+    <loops>
+        <name>Loop_through_Team_Names</name>
+        <label>Loop through Team Names</label>
+        <locationX>248</locationX>
+        <locationY>2942</locationY>
+        <collectionReference>lstTeamNames</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Set_Team_Values</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Insert_Teams</targetReference>
+        </noMoreValuesConnector>
+    </loops>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -267,11 +520,21 @@
         <name>Insert_League_Season</name>
         <label>Insert League Season</label>
         <locationX>380</locationX>
-        <locationY>1886</locationY>
+        <locationY>2462</locationY>
         <connector>
-            <targetReference>Confirmation_Screen</targetReference>
+            <targetReference>Convert_Text_Area_to_Basic_String</targetReference>
         </connector>
         <inputReference>leagueSeason</inputReference>
+    </recordCreates>
+    <recordCreates>
+        <name>Insert_Public_Calendar</name>
+        <label>Insert Public Calendar</label>
+        <locationX>248</locationX>
+        <locationY>2006</locationY>
+        <connector>
+            <targetReference>Set_Public_Calendar_Id</targetReference>
+        </connector>
+        <inputReference>publicCalendar</inputReference>
     </recordCreates>
     <recordCreates>
         <name>Insert_Standings_Config</name>
@@ -282,6 +545,16 @@
             <targetReference>Set_Standings_Config_New</targetReference>
         </connector>
         <inputReference>standingsConfig</inputReference>
+    </recordCreates>
+    <recordCreates>
+        <name>Insert_Teams</name>
+        <label>Insert Teams</label>
+        <locationX>248</locationX>
+        <locationY>3398</locationY>
+        <connector>
+            <targetReference>Confirmation_Screen</targetReference>
+        </connector>
+        <inputReference>lstTeamsToInsert</inputReference>
     </recordCreates>
     <recordLookups>
         <name>Get_League</name>
@@ -344,17 +617,17 @@
         <name>Confirmation_Screen</name>
         <label>Confirmation Screen</label>
         <locationX>380</locationX>
-        <locationY>2006</locationY>
-        <allowBack>true</allowBack>
+        <locationY>3614</locationY>
+        <allowBack>false</allowBack>
         <allowFinish>true</allowFinish>
-        <allowPause>true</allowPause>
+        <allowPause>false</allowPause>
         <fields>
             <name>Confirmation_Screen_Msg</name>
-            <fieldText>&lt;p&gt;&lt;b&gt;Success!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;The {!strLeagueStandingsAutoName} season has been created.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/{!leagueSeason.Id}&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;&gt;&lt;b&gt;View Record&lt;/b&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 14px;&quot;&gt;Success!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;The {!strLeagueStandingsAutoName} season has been created.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;/{!leagueSeason.Id}&quot; rel=&quot;noopener noreferrer&quot; target=&quot;_blank&quot;&gt;&lt;b&gt;View Record&lt;/b&gt;&lt;/a&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
         </fields>
         <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
+        <showHeader>false</showHeader>
     </screens>
     <screens>
         <name>Error_League_Not_Found_Screen</name>
@@ -364,6 +637,11 @@
         <allowBack>false</allowBack>
         <allowFinish>true</allowFinish>
         <allowPause>false</allowPause>
+        <fields>
+            <name>Error_League_Not_Found_Screen_Msg</name>
+            <fieldText>&lt;p&gt;Hmm... something went wrong.&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;Could not find a League ID. Please refresh the page and try again. If the problem persists, contact your system administrator.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
         <showFooter>true</showFooter>
         <showHeader>false</showHeader>
     </screens>
@@ -380,8 +658,34 @@
         </connector>
         <fields>
             <name>League_Season_Details_Title</name>
-            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;b&gt;League Season Details&lt;/b&gt;&lt;/p&gt;</fieldText>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 14px;&quot;&gt;League Season Details&lt;/b&gt;&lt;/p&gt;</fieldText>
             <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>Input_Override_Name_Toggle</name>
+            <extensionName>flowruntime:toggle</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Override League Season Name</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>messageToggleActive</name>
+                <value>
+                    <stringValue>Enter League Season Name</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>messageToggleInactive</name>
+                <value>
+                    <stringValue>Use System Naming</stringValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
         </fields>
         <fields>
             <name>League_Season_Details_Screen_Section1</name>
@@ -390,14 +694,11 @@
                 <name>League_Season_Details_Screen_Section1_Column1</name>
                 <fieldType>Region</fieldType>
                 <fields>
-                    <fieldType>ObjectProvided</fieldType>
-                    <isRequired>false</isRequired>
-                    <objectFieldReference>leagueSeason.Start_Date__c</objectFieldReference>
-                </fields>
-                <fields>
-                    <fieldType>ObjectProvided</fieldType>
-                    <isRequired>false</isRequired>
-                    <objectFieldReference>leagueSeason.End_Date__c</objectFieldReference>
+                    <name>Input_League_Season_Name_Text</name>
+                    <dataType>String</dataType>
+                    <fieldText>League Season Name</fieldText>
+                    <fieldType>InputField</fieldType>
+                    <isRequired>true</isRequired>
                 </fields>
                 <inputParameters>
                     <name>width</name>
@@ -410,18 +711,75 @@
             <fields>
                 <name>League_Season_Details_Screen_Section1_Column2</name>
                 <fieldType>Region</fieldType>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Input_Override_Name_Toggle.value</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>true</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>League_Season_Details_Screen_Section2</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>League_Season_Details_Screen_Section2_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <fieldType>ObjectProvided</fieldType>
+                    <isRequired>false</isRequired>
+                    <objectFieldReference>leagueSeason.Start_Date__c</objectFieldReference>
+                </fields>
+                <fields>
+                    <fieldType>ObjectProvided</fieldType>
+                    <isRequired>false</isRequired>
+                    <objectFieldReference>leagueSeason.End_Date__c</objectFieldReference>
+                </fields>
+                <fields>
+                    <name>Input_Season_Picklist</name>
+                    <choiceReferences>pickChoiceSeasons</choiceReferences>
+                    <dataType>String</dataType>
+                    <fieldText>Season</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <isRequired>false</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>League_Season_Details_Screen_Section2_Column2</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <fieldType>ObjectProvided</fieldType>
+                    <isRequired>false</isRequired>
+                    <objectFieldReference>leagueSeason.Minimum_Age__c</objectFieldReference>
+                </fields>
+                <fields>
+                    <fieldType>ObjectProvided</fieldType>
+                    <isRequired>false</isRequired>
+                    <objectFieldReference>leagueSeason.Maximum_Age__c</objectFieldReference>
+                </fields>
                 <fields>
                     <fieldType>ObjectProvided</fieldType>
                     <isRequired>false</isRequired>
                     <objectFieldReference>leagueSeason.Length_of_Games__c</objectFieldReference>
-                </fields>
-                <fields>
-                    <name>Input_Ranking_Type_Picklist</name>
-                    <choiceReferences>pickChoiceRankTypes</choiceReferences>
-                    <dataType>String</dataType>
-                    <fieldText>Input Ranking Type Picklist</fieldText>
-                    <fieldType>DropdownBox</fieldType>
-                    <isRequired>true</isRequired>
                 </fields>
                 <inputParameters>
                     <name>width</name>
@@ -434,10 +792,50 @@
             <isRequired>false</isRequired>
         </fields>
         <fields>
-            <name>League_Season_Details_Screen_Section2</name>
+            <name>League_Points_System_Details_Title</name>
+            <fieldText>&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b style=&quot;font-size: 14px;&quot;&gt;Standings Options&lt;/b&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>League_Season_Details_Screen_Section3</name>
             <fieldType>RegionContainer</fieldType>
             <fields>
-                <name>League_Season_Details_Screen_Section2_Column1</name>
+                <name>League_Season_Details_Screen_Section3_Column1</name>
+                <fieldType>Region</fieldType>
+                <fields>
+                    <name>Input_Ranking_Type_Picklist</name>
+                    <choiceReferences>pickChoiceRankTypes</choiceReferences>
+                    <dataType>String</dataType>
+                    <fieldText>Team Rankings Type</fieldText>
+                    <fieldType>DropdownBox</fieldType>
+                    <isRequired>true</isRequired>
+                </fields>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <fields>
+                <name>League_Season_Details_Screen_Section3_Column2</name>
+                <fieldType>Region</fieldType>
+                <inputParameters>
+                    <name>width</name>
+                    <value>
+                        <stringValue>6</stringValue>
+                    </value>
+                </inputParameters>
+                <isRequired>false</isRequired>
+            </fields>
+            <isRequired>false</isRequired>
+        </fields>
+        <fields>
+            <name>League_Season_Details_Screen_Section4</name>
+            <fieldType>RegionContainer</fieldType>
+            <fields>
+                <name>League_Season_Details_Screen_Section4_Column1</name>
                 <fieldType>Region</fieldType>
                 <fields>
                     <name>Input_Points_per_Win</name>
@@ -456,7 +854,7 @@
                 <isRequired>false</isRequired>
             </fields>
             <fields>
-                <name>League_Season_Details_Screen_Section2_Column2</name>
+                <name>League_Season_Details_Screen_Section4_Column2</name>
                 <fieldType>Region</fieldType>
                 <fields>
                     <name>Input_Points_per_Loss</name>
@@ -475,7 +873,7 @@
                 <isRequired>false</isRequired>
             </fields>
             <fields>
-                <name>League_Season_Details_Screen_Section2_Column3</name>
+                <name>League_Season_Details_Screen_Section4_Column3</name>
                 <fieldType>Region</fieldType>
                 <fields>
                     <name>Points_per_Tie</name>
@@ -506,123 +904,117 @@
             </visibilityRule>
         </fields>
         <fields>
-            <name>League_Season_Details_Screen_Section3</name>
-            <fieldType>RegionContainer</fieldType>
-            <fields>
-                <name>League_Season_Details_Screen_Section3_Column1</name>
-                <fieldType>Region</fieldType>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>3</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <fields>
-                <name>League_Season_Details_Screen_Section3_Column2</name>
-                <fieldType>Region</fieldType>
-                <fields>
-                    <name>Input_Override_Name_Toggle</name>
-                    <extensionName>flowruntime:toggle</extensionName>
-                    <fieldType>ComponentInstance</fieldType>
-                    <inputParameters>
-                        <name>label</name>
-                        <value>
-                            <stringValue>Override League Name</stringValue>
-                        </value>
-                    </inputParameters>
-                    <inputParameters>
-                        <name>messageToggleActive</name>
-                        <value>
-                            <stringValue>Enter League Name</stringValue>
-                        </value>
-                    </inputParameters>
-                    <inputParameters>
-                        <name>messageToggleInactive</name>
-                        <value>
-                            <stringValue>Use System Naming</stringValue>
-                        </value>
-                    </inputParameters>
-                    <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
-                    <isRequired>true</isRequired>
-                    <storeOutputAutomatically>true</storeOutputAutomatically>
-                </fields>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>6</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <fields>
-                <name>League_Season_Details_Screen_Section3_Column3</name>
-                <fieldType>Region</fieldType>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>3</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <isRequired>false</isRequired>
+            <name>Online_Availability_Title</name>
+            <fieldText>&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b style=&quot;font-size: 14px;&quot;&gt;Online Availability&lt;/b&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
         </fields>
         <fields>
-            <name>League_Season_Details_Screen_Section4</name>
-            <fieldType>RegionContainer</fieldType>
-            <fields>
-                <name>League_Season_Details_Screen_Section4_Column1</name>
-                <fieldType>Region</fieldType>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>3</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <fields>
-                <name>League_Season_Details_Screen_Section4_Column2</name>
-                <fieldType>Region</fieldType>
-                <fields>
-                    <name>Input_League_Season_Name_Text</name>
-                    <dataType>String</dataType>
-                    <fieldText>League Season Name</fieldText>
-                    <fieldType>InputField</fieldType>
-                    <isRequired>true</isRequired>
-                </fields>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>6</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <fields>
-                <name>League_Season_Details_Screen_Section4_Column3</name>
-                <fieldType>Region</fieldType>
-                <inputParameters>
-                    <name>width</name>
-                    <value>
-                        <stringValue>3</stringValue>
-                    </value>
-                </inputParameters>
-                <isRequired>false</isRequired>
-            </fields>
-            <isRequired>false</isRequired>
+            <fieldType>ObjectProvided</fieldType>
+            <isRequired>true</isRequired>
+            <objectFieldReference>leagueSeason.Public__c</objectFieldReference>
+        </fields>
+        <fields>
+            <name>Input_Create_Public_Calendar_Checkbox</name>
+            <dataType>Boolean</dataType>
+            <fieldText>Create Public Calendar</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>&lt;p&gt;Associate this League Season with a Public Calendar to display League Games in Experience Cloud&lt;/p&gt;</helpText>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>Input_Public_Calendar_Toggle</name>
+            <extensionName>flowruntime:toggle</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Create New Public Calendar</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>value</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>messageToggleActive</name>
+                <value>
+                    <stringValue>Create New</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>messageToggleInactive</name>
+                <value>
+                    <stringValue>Choose Existing</stringValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
             <visibilityRule>
                 <conditionLogic>and</conditionLogic>
                 <conditions>
-                    <leftValueReference>Input_Override_Name_Toggle.value</leftValueReference>
+                    <leftValueReference>Input_Create_Public_Calendar_Checkbox</leftValueReference>
                     <operator>EqualTo</operator>
                     <rightValue>
                         <booleanValue>true</booleanValue>
                     </rightValue>
                 </conditions>
             </visibilityRule>
+        </fields>
+        <fields>
+            <name>Input_Public_Calendar_Lookup</name>
+            <extensionName>flowruntime:lookup</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>fieldApiName</name>
+                <value>
+                    <stringValue>Public_Calendar__c</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Public Calendar</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>objectApiName</name>
+                <value>
+                    <stringValue>League_Season__c</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>required</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Input_Public_Calendar_Toggle.value</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <booleanValue>false</booleanValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>Team_Names_Title</name>
+            <fieldText>&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b style=&quot;font-size: 14px;&quot;&gt;Create Teams&lt;/b&gt;&lt;/p&gt;&lt;p&gt;To create Teams with this League Season, enter Team names separated by semi-colons&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>Input_Team_Names_Text_Area</name>
+            <fieldText>Team Names</fieldText>
+            <fieldType>LargeTextArea</fieldType>
+            <isRequired>false</isRequired>
         </fields>
         <showFooter>true</showFooter>
         <showHeader>false</showHeader>
@@ -642,6 +1034,36 @@
         <isInput>false</isInput>
         <isOutput>false</isOutput>
         <objectType>League_Season__c</objectType>
+    </variables>
+    <variables>
+        <name>lstTeamNames</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>lstTeamsToInsert</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Team__c</objectType>
+    </variables>
+    <variables>
+        <name>publicCalendar</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Public_Calendar__c</objectType>
+    </variables>
+    <variables>
+        <name>publicCalendarId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
     </variables>
     <variables>
         <name>recordId</name>
@@ -664,5 +1086,20 @@
         <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>strUnseparatedNames</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>team</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Team__c</objectType>
     </variables>
 </Flow>
