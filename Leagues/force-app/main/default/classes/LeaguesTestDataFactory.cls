@@ -44,7 +44,7 @@ public class LeaguesTestDataFactory {
     ) {
         List<League__c> lstLeagues = new List<League__c>();
         for (Integer i = 0; i < numLeagues; i++) {
-            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i), Sport__c = sport, Minimum_Age__c = minAge, Maximum_Age__c = maxAge));
+            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i), Sport__c = sport));
         }
         insert lstLeagues;
         List<League_Season__c> lstLeagueSeasons = new List<League_Season__c>();
@@ -55,6 +55,8 @@ public class LeaguesTestDataFactory {
                 ls.League_Ranking_Type__c = leagueRankingType;
                 ls.Start_Date__c = Date.today().addDays(-30).addYears(-i);
                 ls.End_Date__c = Date.today().addDays(30).addYears(-i);
+                ls.Minimum_Age__c = minAge;
+                ls.Maximum_Age__c = maxAge;
                 if (leagueRankingType == 'Points System') {
                     System.debug('Should be adding config');
                     Standings_Configuration__c sc = createConfig();

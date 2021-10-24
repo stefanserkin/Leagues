@@ -1,5 +1,6 @@
 <template>
     <lightning-card title={cardTitle}>
+        <lightning-button label="New Team" onclick={handleTeamCreation} slot="actions"></lightning-button>
         <c-league-season-standings
             league-season-id={recordId}
             show-team-logos={showTeamLogos}

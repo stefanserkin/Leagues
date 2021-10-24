@@ -7,18 +7,32 @@ public with sharing class LeagueGameHandler {
         List<League_Game__c> lstGamesInTrigger,
         Map<Id, League_Game__c> mapOldGamesInTrigger,
         Boolean isBefore, Boolean isAfter,
-        Boolean isInsert, Boolean isUpdate
+        Boolean isInsert, Boolean isUpdate, Boolean isDelete
     ){
+        String triggerDmlContext;
+        if (isInsert) {
+            triggerDmlContext = 'isInsert';
+        } else if (isUpdate) {
+            triggerDmlContext = 'isUpdate';
+        } else if (isDelete) {
+            triggerDmlContext = 'isDelete';
+        }
         if (isBefore) {
-            processBefore(lstGamesInTrigger);
+            processBefore(lstGamesInTrigger, triggerDmlContext);
         } else if (isAfter) {
-            processAfter(lstGamesInTrigger, mapOldGamesInTrigger);
+            processAfter(lstGamesInTrigger, mapOldGamesInTrigger, triggerDmlContext);
         }
     }
 
-    private static void processBefore(List<League_Game__c> lstGamesInTrigger) {
+    private static void processBefore(
+        List<League_Game__c> lstGamesInTrigger,
+        String triggerDmlContext
+    ) {
+        if (triggerDmlContext == 'isDelete') {
+            LeagueGameEventSync.syncEventsToGames(lstGamesInTrigger, null, triggerDmlContext);
+        }
         for (League_Game__c game : lstGamesInTrigger) {
-            if (String.isBlank(game.Name)) {
+            if (!game.Override_League_Game_Name__c) {
                 game.Name = getSeasonGameName(game);
             }
             if (String.isBlank(game.Status__c)) {
@@ -32,7 +46,8 @@ public with sharing class LeagueGameHandler {
 
     private static void processAfter(
         List<League_Game__c> lstGamesInTrigger,
-        Map<Id, League_Game__c> mapOldGamesInTrigger
+        Map<Id, League_Game__c> mapOldGamesInTrigger,
+        String triggerDmlContext
     ) {
         Set<Id> setTeamIds = new Set<Id>();
         for (League_Game__c game : lstGamesInTrigger) {
@@ -62,6 +77,12 @@ public with sharing class LeagueGameHandler {
         if (!setTeamIds.isEmpty()) {
             recalcTeamRecords(setTeamIds);
         }
+        // Sync events
+        LeagueGameEventSync.syncEventsToGames(
+            lstGamesInTrigger, 
+            mapOldGamesInTrigger, 
+            triggerDmlContext
+        );
     }
 
     private static String getSeasonGameName(League_Game__c game) {

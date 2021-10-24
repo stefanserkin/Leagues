@@ -1,10 +1,13 @@
 import { LightningElement, api, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
 import { loadStyle } from 'lightning/platformResourceLoader';
 import { getRecord } from 'lightning/uiRecordApi';
 import STYLES from '@salesforce/resourceUrl/LeagueStandingsStyles';
 import getTeams from '@salesforce/apex/LeagueSeasonStandingsController.getTeams';
+import DEFAULT_LOGO_ICON from '@salesforce/resourceUrl/leaguesDefaultLogo';
 
-import LEAGUE_NAME_FIELD from '@salesforce/schema/League_Season__c.League_Name__c';
+import LEAGUE_SEASON_NAME_FIELD from '@salesforce/schema/League_Season__c.Name';
 import START_DATE_FIELD from '@salesforce/schema/League_Season__c.Start_Date__c';
 import END_DATE_FIELD from '@salesforce/schema/League_Season__c.End_Date__c';
 import LEAGUE_RANKING_TYPE_FIELD from '@salesforce/schema/League_Season__c.League_Ranking_Type__c';
@@ -87,15 +90,17 @@ const COLS_WIN_PERC_NO_LOGOS = [
     }
 ];
 
-export default class LeagueSeasonStandings extends LightningElement {
+export default class LeagueSeasonStandings extends NavigationMixin(LightningElement) {
     @api showTeamLogos;
     @api leagueSeasonId;
     isLoading = true;
     isCssLoaded = false;
     error;
 
+    defaultTeamLogo = DEFAULT_LOGO_ICON;
+
     get cardTitle() {
-        return `${this.leagueName} Standings`;
+        return `${this.leagueSeasonName} Standings`;
     }
 
     get leagueStartDateFormatted() {
@@ -139,14 +144,14 @@ export default class LeagueSeasonStandings extends LightningElement {
         return tempCols;
     }
 
-    leagueName;
+    leagueSeasonName;
     leagueStartDate;
     leagueEndDate;
     leagueRankingType;
 
     @wire(getRecord, {
         recordId: '$leagueSeasonId',
-        fields: [LEAGUE_NAME_FIELD, START_DATE_FIELD, END_DATE_FIELD, LEAGUE_RANKING_TYPE_FIELD]
+        fields: [LEAGUE_SEASON_NAME_FIELD, START_DATE_FIELD, END_DATE_FIELD, LEAGUE_RANKING_TYPE_FIELD]
     }) wireuser({
         error,
         data
@@ -154,10 +159,9 @@ export default class LeagueSeasonStandings extends LightningElement {
         if (error) {
            this.error = error; 
         } else if (data) {
-            this.leagueName = data.fields.League_Name__c.value;
+            this.leagueSeasonName = data.fields.Name.value;
             this.leagueStartDate = data.fields.Start_Date__c.value;
             this.leagueEndDate = data.fields.End_Date__c.value;
-            console.log(typeof this.leagueEndDate);
             this.leagueRankingType = data.fields.League_Ranking_Type__c.value;
             this.isLoading = false;
         }
@@ -178,7 +182,6 @@ export default class LeagueSeasonStandings extends LightningElement {
             let teamLogo;
             let parsedTeamsData = JSON.parse(JSON.stringify(result.data));
             parsedTeamsData = parsedTeamsData.map(row => {
-                console.log(row.Winning_Percentage__c);
                 teamUrl = `/${row.Id}`;
                 if (row.Team_Logo_URL__c) {
                     teamLogo = row.Team_Logo_URL__c;
@@ -196,7 +199,6 @@ export default class LeagueSeasonStandings extends LightningElement {
 
             this.teams = parsedTeamsData;
             this.error = undefined;
-            console.table(parsedTeamsData);
             this.isLoading = false;
         }
     }

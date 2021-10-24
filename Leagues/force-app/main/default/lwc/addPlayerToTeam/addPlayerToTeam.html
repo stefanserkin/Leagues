@@ -1,0 +1,37 @@
+<template>
+    <!-- SPINNER ON LOAD -->
+    <lightning-spinner if:true={isLoading} alternative-text="Loading" variant="brand" size="large"></lightning-spinner>
+    <template if:false={isFormEntry}>
+        <div class="slds-align_absolute-center">
+            <lightning-button label="New Player" variant="brand-outline" onclick={handleOpenForm}></lightning-button>
+        </div>
+    </template>
+    <template if:true={isFormEntry}>
+        <lightning-card title="New Player" class="slds-var-m-around_medium">
+            <c-leagues-search-component
+                obj-name="Contact"
+                icon-name="standard:contact"
+                label-name="Contact"
+                placeholder="Search" 
+                fields={fields}
+                display-fields={displayFields}
+                onlookup={handleLookup} >
+            </c-leagues-search-component>
+            <lightning-input
+                type="number"
+                label="Uniform Number"
+                onchange={handleUniformNumberChange}
+                required
+            ></lightning-input>
+            <lightning-button 
+                label="Cancel" 
+                onclick={handleCloseForm}
+            ></lightning-button>
+            <lightning-button
+                label="Add Player to Roster"
+                variant="brand"
+                onclick={handleCreatePlayer}
+            ></lightning-button>
+        </lightning-card>
+    </template>
+</template>

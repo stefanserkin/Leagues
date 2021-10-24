@@ -3,10 +3,8 @@
     <lightning-card title={cardTitle}>
         <!-- SPINNER ON LOAD -->
         <lightning-spinner if:true={isLoading} alternative-text="Loading" variant="brand" size="large"></lightning-spinner>
+        
         <template if:false={isLoading}>
-            <h3 class="slds-text-heading_small slds-var-m-around_medium">
-                {leagueStartDateFormatted} - {leagueEndDateFormatted}
-            </h3> 
             <template if:true={teams}>
                 <c-league-season-datatable
                     key-field="Id"

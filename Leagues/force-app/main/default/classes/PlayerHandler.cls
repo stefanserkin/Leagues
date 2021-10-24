@@ -14,27 +14,31 @@ public with sharing class PlayerHandler {
     private static void handleBefore(List<Player__c> lstPlayersInTrigger) {
         loadTeamPlayerCache();
         for (Player__c player : lstPlayersInTrigger) {
+            Boolean numberIsTaken = false;
             Boolean numberIsDuplicate = false;
             if (player.Uniform_Number__c != null) {
-                numberIsDuplicate = isDuplicateNumberForTeam(player.Uniform_Number__c, player.Team__c);
+                numberIsTaken = isDuplicateNumberForTeam(player.Uniform_Number__c, player.Team__c);
             }
-            if (numberIsDuplicate) {
+            if (numberIsTaken) {
                 Integer uniNumber = player.Uniform_Number__c.intValue();
                 String matchingPlayerName = mapTeamsToTakenNumbers.get(player.Team__c)?.get(player.Uniform_Number__c);
-                String eMessage = matchingPlayerName + ' has already been assigned number ' + uniNumber + '.';
-                eMessage += '\n' + ' Please choose a different number or change ' + matchingPlayerName + '\'s number before saving.';
-                player.addError(eMessage);
+                if (matchingPlayerName != player.Player_Name__c) {
+                    numberIsDuplicate = true;
+                }
+                if (numberIsDuplicate) {
+                    String eMessage = matchingPlayerName + ' has already been assigned number ' + uniNumber + '.';
+                    eMessage += '\n' + ' Please choose a different number or change ' + matchingPlayerName + '\'s number before saving.';
+                    player.addError(eMessage);
+                }
             }
         }
     }
 
     private static Boolean isDuplicateNumberForTeam(Decimal uniNumber, Id teamId) {
         Boolean numberIsDuplicate = false;
-        System.debug(':::: uniNumber is ' + uniNumber);
-        System.debug(':::: teamId is ' + teamId);
-        System.debug(':::: map is ' + mapTeamsToTakenNumbers.get(teamId));
         if (mapTeamsToTakenNumbers.get(teamId) != null) {
             numberIsDuplicate = mapTeamsToTakenNumbers.get(teamId)?.containsKey(uniNumber);
+
         }
         return numberIsDuplicate;
     }

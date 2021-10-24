@@ -5,13 +5,13 @@ public with sharing class LeagueSeasonStandingsController {
         String strOrderBy;
         switch on leagueRankingType {
             when 'Points System' {
-                strOrderBy = 'Points__c DESC';
+                strOrderBy = 'Points__c DESC NULLS last';
             }
             when 'Winning Percentage' {
-                strOrderBy = 'Winning_Percentage__c DESC';
+                strOrderBy = 'Winning_Percentage__c DESC NULLS last';
             }
             when else {
-                strOrderBy = 'Name ASC';
+                strOrderBy = 'Name ASC NULLS last';
             }
         }
         String strQuery = 'SELECT Id, Name, Wins__c, Losses__c, Ties__c, Winning_Percentage__c, Points__c, Games_Played__c, League_Name__c, Team_Logo_URL__c';
