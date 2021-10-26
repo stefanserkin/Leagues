@@ -1,7 +1,9 @@
 public with sharing class LeagueGameHandler {
 
     private static Map<Id, Team__c> mapTeamCache;
+    private static Boolean mapTeamCacheIsSet = false;
     private static Map<Id, League_Season__c> mapSeasonsWithConfigCache;
+    private static Boolean mapSeasonsWithConfigCacheIsSet = false;
 
     public static void handleTriggerEvent(
         List<League_Game__c> lstGamesInTrigger,
@@ -29,11 +31,13 @@ public with sharing class LeagueGameHandler {
         String triggerDmlContext
     ) {
         if (triggerDmlContext == 'isDelete') {
-            LeagueGameEventSync.syncEventsToGames(lstGamesInTrigger, null, triggerDmlContext);
+            System.debug('Entered sync for deletion');
+            LeagueGameEventSync.syncEventsToGames(lstGamesInTrigger, null, null, triggerDmlContext);
+            return;
         }
         for (League_Game__c game : lstGamesInTrigger) {
             if (!game.Override_League_Game_Name__c) {
-                game.Name = getSeasonGameName(game);
+                game.Name = getSeasonGameName(game, true);
             }
             if (String.isBlank(game.Status__c)) {
                 game.Status__c = getStatus(game);
@@ -81,23 +85,27 @@ public with sharing class LeagueGameHandler {
         LeagueGameEventSync.syncEventsToGames(
             lstGamesInTrigger, 
             mapOldGamesInTrigger, 
+            mapTeamCache,
             triggerDmlContext
         );
     }
 
-    private static String getSeasonGameName(League_Game__c game) {
+    public static String getSeasonGameName(League_Game__c game, Boolean includeGametime) {
         String strHomeTeamName = getTeamName(game.Home_Team__c);
         String strAwayTeamName = getTeamName(game.Away_Team__c);
         String strGameTime     = game.Game_Time__c.format();
-        String strGameName     = strAwayTeamName + ' at ' + strHomeTeamName + ' - ' + strGameTime;
+        String strGameName     = strAwayTeamName + ' at ' + strHomeTeamName;
+        if (includeGametime) {
+            strGameName += ' - ' + strGameTime;
+        }
         return strGameName;
     }
 
     private static String getTeamName(Id teamId) {
         String strName = '';
         // If teams have already been queried, return team name for id
-        if (mapTeamCache != null) {
-            strName = mapTeamCache.get(teamId).Name;
+        if (mapTeamCacheIsSet) {
+            strName = mapTeamCache.get(teamId)?.Name;
             return strName;
         }
         // Otherwise, load map and return team name for id
@@ -106,6 +114,8 @@ public with sharing class LeagueGameHandler {
               FROM Team__c
              LIMIT 10000
         ]);
+        mapTeamCacheIsSet = true;
+
         strName = mapTeamCache.get(teamId)?.Name;
         return strName;
     }
@@ -122,7 +132,7 @@ public with sharing class LeagueGameHandler {
 
     private static String getLeagueSeasonId(Id teamId) {
         String strSeasonId = '';
-        if (mapTeamCache != null) {
+        if (mapTeamCacheIsSet) {
             strSeasonId = mapTeamCache.get(teamId).League_Season__c;
             return strSeasonId;
         }
@@ -132,6 +142,8 @@ public with sharing class LeagueGameHandler {
               FROM Team__c
              LIMIT 10000
         ]);
+        mapTeamCacheIsSet = true;
+
         strSeasonId = mapTeamCache.get(teamId).League_Season__c;
         return strSeasonId;
     }
@@ -229,7 +241,7 @@ public with sharing class LeagueGameHandler {
         Id leagueSeasonId
     ) {
         League_Season__c ls = new League_Season__c();
-        if (mapSeasonsWithConfigCache != null) {
+        if (mapSeasonsWithConfigCacheIsSet) {
             ls = mapSeasonsWithConfigCache.get(leagueSeasonId);
         } else {
             mapSeasonsWithConfigCache = new Map<Id, League_Season__c>([
@@ -241,6 +253,7 @@ public with sharing class LeagueGameHandler {
                   WITH SECURITY_ENFORCED
                  LIMIT 10000
             ]);
+            mapSeasonsWithConfigCacheIsSet = true;
             ls = mapSeasonsWithConfigCache.get(leagueSeasonId);
         }
         return ls;

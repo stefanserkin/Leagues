@@ -1,0 +1,20 @@
+<template>
+    
+    <lightning-card title={cardTitle}>
+        <!-- SPINNER ON LOAD -->
+        <lightning-spinner if:true={isLoading} alternative-text="Loading" variant="brand" size="large"></lightning-spinner>
+        
+        <template if:false={isLoading}>
+            <template if:true={teams}>
+                <c-league-season-datatable
+                    key-field="Id"
+                    data={teams}
+                    columns={cols}
+                    column-widths-mode="auto"
+                    hide-checkbox-column
+                ></c-league-season-datatable>
+            </template>
+        </template>
+    </lightning-card>
+
+</template>

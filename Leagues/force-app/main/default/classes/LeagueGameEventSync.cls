@@ -6,6 +6,7 @@ public with sharing class LeagueGameEventSync {
     public static void syncEventsToGames(
         List<League_Game__c> lstGames,
         Map<Id, League_Game__c> mapOldGames,
+        Map<Id, Team__c> mapTeams,
         String triggerDmlContext
     ) {
         switch on triggerDmlContext {
@@ -13,7 +14,7 @@ public with sharing class LeagueGameEventSync {
                 createEventsForGames(lstGames);
             }
             when 'isUpdate' {
-                updateEventsForGames(lstGames, mapOldGames);
+                updateEventsForGames(lstGames, mapOldGames, mapTeams);
             }
             when 'isDelete' {
                 deleteEventsForGames(lstGames);
@@ -24,6 +25,9 @@ public with sharing class LeagueGameEventSync {
     private static void createEventsForGames(List<League_Game__c> lstGames) {
         List<Event> lstEvents = new List<Event>();
         for (League_Game__c lg : lstGames) {
+            String strSubject = getEventSubjectFromGame(lg);
+            String lgUrl = '/s/league-game/' + lg.Id + '/';
+
             lstEvents.add(
                 new Event(
                     ActivityDate = Date.newInstance(
@@ -45,9 +49,12 @@ public with sharing class LeagueGameEventSync {
                     RecordTypeId = ccCalEventRecTypeId,
                     ShowAs = 'Busy',
                     StartDateTime = lg.Game_Time__c,
-                    Subject = lg.Name,
-                    WhatId = lg.Public_Calendar_ID__c,
-                    League_Game_ID__c = lg.Id
+                    Subject = strSubject,
+                    WhatId = lg.League_Season__c,
+                    League_Game_ID__c = lg.Id,
+                    cccalendar__Event_URL_Text__c = 'Game Details',
+                    cccalendar__Event_URL__c = lgUrl,
+                    Location = lg.Venue_Name_and_Address__c
                 )
             );
         }
@@ -56,22 +63,24 @@ public with sharing class LeagueGameEventSync {
 
     private static void updateEventsForGames(
         List<League_Game__c> lstGames,
-        Map<Id, League_Game__c> mapOldGames
+        Map<Id, League_Game__c> mapOldGames,
+        Map<Id, Team__c> mapTeams
     ) {
         Set<Id> eventGameIds = new Set<Id>();
-        for(League_Game__c lg : lstGames) {
-            if (lg.Game_Time__c != mapOldGames.get(lg.Id).Game_Time__c) {
-                eventGameIds.add(lg.Id);
+        for(League_Game__c game : lstGames) {
+            League_Game__c oldGame = mapOldGames.get(game.Id);
+            if (
+                game.Game_Time__c != oldGame.Game_Time__c || 
+                game.Status__c != oldGame.Status__c ||
+                game.Game_Result__c != oldGame.Game_Result__c ||
+                game.Venue__c != oldGame.Venue__c
+            ) {
+                eventGameIds.add(game.Id);
             }
         }
 
-        if (!eventGameIds.isEmpty()) {
+        if (eventGameIds.isEmpty()) {
             return;
-        }
-
-        Map<Id, League_Game__c> mapLeagueGames = new Map<Id, League_Game__c>();
-        for (League_Game__c game : lstGames) {
-            mapLeagueGames.put(game.Id, game);
         }
 
         List<Event> lstEvents = [
@@ -80,27 +89,48 @@ public with sharing class LeagueGameEventSync {
              WHERE League_Game_ID__c IN :eventGameIds 
               WITH SECURITY_ENFORCED
         ];
-        
-        if (lstEvents != null && !lstEvents.isEmpty()) {
-            for (Event ev : lstEvents) {
-                League_Game__c matchingGame = mapLeagueGames.get(ev.League_Game_ID__c);
-                ev.StartDateTime = matchingGame.Game_Time__c;
-                ev.EndDateTime   = matchingGame.End_Time__c;
-                ev.Subject       = matchingGame.Name;
-            }
+
+        Map<Id, Event> mapEvents = new Map<Id, Event>();
+        for (Event event : lstEvents) {
+            mapEvents.put(event.League_Game_ID__c, event);
         }
-        update lstEvents;
+
+        List<Event> lstEventsToUpdate = new List<Event>();
+        for (League_Game__c lg : lstGames) {
+            String strSubject = getEventSubjectFromGame(lg);
+
+            Event ev = mapEvents.get(lg.Id);
+            ev.StartDateTime = lg.Game_Time__c;
+            ev.EndDateTime   = lg.End_Time__c;
+            ev.Subject       = strSubject;
+            ev.Location      = lg.Venue_Name_and_Address__c;
+            lstEventsToUpdate.add(ev);
+        }
+        update lstEventsToUpdate;
+
     }
 
     private static void deleteEventsForGames(List<League_Game__c> lstGames) {
+        System.debug(':::: entered delete events method');
         Set<Id> setGameIds = new Set<Id>();
         for (League_Game__c lg : lstGames) {
             setGameIds.add(lg.Id);
         }
         List<Event> lstEventsToDelete = [SELECT Id FROM Event WHERE League_Game_ID__c IN :setGameIds WITH SECURITY_ENFORCED];
+        System.debug(':::: lstEventsToDelete has ' + lstEventsToDelete.size() + ' records');
         if (!lstEventsToDelete.isEmpty()) {
             delete lstEventsToDelete;
         }
+    }
+
+    private static String getEventSubjectFromGame(League_Game__c game) {
+        String strSubject = LeagueGameHandler.getSeasonGameName(game, false);
+        if (game.Status__c == 'Complete') {
+            strSubject += ' (' + game.Game_Result__c + ')';
+        } else if (game.Status__c == 'Cancelled' || game.Status__c == 'Postponed') {
+            strSubject += ' (' + game.Status__c + ')';
+        }
+        return strSubject;
     }
 
 }

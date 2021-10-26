@@ -1,72 +1,30 @@
 <template>
-    <lightning-tabset variant="vertical" active-tab-value="Soccer">
-
-        <lightning-tab label="Soccer" value="Soccer" onactive={handleActive}>
-            <div class="slds-var-m-around_medium">
-                <div class="slds-align_absolute-center slds-var-m-around_medium">
-                    <lightning-combobox
-                        name="LeagueSeason"
-                        label="League Season"
-                        placeholder="Select Season"
-                        value={leagueSeasonChoice}
-                        onchange={handleLeagueSeasonChange}
-                        options={leagueSeasonOptionValues}
-                        style="width:500px">
-                    </lightning-combobox>
-                </div>
-                <c-league-season-standings
+    <lightning-card title={cardTitle}>
+        <div class="slds-var-m-around_medium">
+            <lightning-combobox
+                name="LeagueSeason"
+                slot="actions"
+                label="League Season"
+                placeholder="Select Season"
+                value={leagueSeasonChoice}
+                onchange={handleLeagueSeasonChange}
+                options={leagueSeasonOptionValues}
+                class="slds-var-m-around_medium"
+                style="width:500px">
+            </lightning-combobox>
+            <template if:true={selectedLeagueSeason}>
+                <c-external-league-season-standings
                     league-season-id={selectedLeagueSeason}
                     show-team-logos={showTeamLogos}
-                ></c-league-season-standings>
-            </div>
-            Soccer Content !
-        </lightning-tab>
-
-        <lightning-tab label="Baseball" value="Baseball" onactive={handleActive}>
-            <div class="slds-var-m-around_medium">
-                <div class="slds-align_absolute-center slds-var-m-around_medium">
-                    <lightning-combobox
-                        name="LeagueSeason"
-                        label="League Season"
-                        placeholder="Select Season"
-                        value={leagueSeasonChoice}
-                        onchange={handleLeagueSeasonChange}
-                        options={leagueSeasonOptionValues}
-                        style="width:500px">
-                    </lightning-combobox>
+                ></c-external-league-season-standings>
+                <div class="slds-align_absolute-center">
+                    <lightning-button 
+                        label="Go To Season Page" 
+                        onclick={handleGoToSeason} 
+                        class="slds-var-m-around_medium"
+                    ></lightning-button>
                 </div>
-                <c-league-season-standings
-                    league-season-id={selectedLeagueSeason}
-                    show-team-logos={showTeamLogos}
-                ></c-league-season-standings>
-            </div>
-            <template if:true={leagueSeasons}>
-                Baseball Content !
             </template>
-        </lightning-tab>
-
-        <lightning-tab label="Basketball">
-            <div class="slds-var-m-around_medium">
-                <div class="slds-align_absolute-center slds-var-m-around_medium">
-                    <lightning-combobox
-                        name="LeagueSeason"
-                        label="League Season"
-                        placeholder="Select Season"
-                        value={leagueSeasonChoice}
-                        onchange={handleLeagueSeasonChange}
-                        options={leagueSeasonOptionValues}
-                        style="width:500px">
-                    </lightning-combobox>
-                </div>
-                <c-league-season-standings
-                    league-season-id={selectedLeagueSeason}
-                    show-team-logos={showTeamLogos}
-                ></c-league-season-standings>
-            </div>
-            <template if:true={leagueSeasons}>
-                Basketball Content !
-            </template>
-        </lightning-tab>
-
-    </lightning-tabset>
+        </div>
+    </lightning-card>
 </template>

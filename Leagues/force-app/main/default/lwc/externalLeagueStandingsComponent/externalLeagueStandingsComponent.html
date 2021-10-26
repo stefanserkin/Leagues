@@ -17,6 +17,13 @@
                     league-season-id={selectedLeagueSeason}
                     show-team-logos={showTeamLogos}
                 ></c-league-season-standings>
+                <div class="slds-align_absolute-center">
+                    <lightning-button 
+                        label="Go To Season Page" 
+                        onclick={handleGoToSeason} 
+                        class="slds-var-m-around_medium"
+                    ></lightning-button>
+                </div>
             </template>
         </div>
     </lightning-card>

@@ -11,7 +11,7 @@ public class LeaguesTestDataFactory {
     ) {
         List<League__c> lstLeagues = new List<League__c>();
         for (Integer i = 0; i < numLeagues; i++) {
-            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i), Sport__c = sport));
+            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i)));
         }
         insert lstLeagues;
         List<League_Season__c> lstLeagueSeasons = new List<League_Season__c>();
@@ -44,7 +44,7 @@ public class LeaguesTestDataFactory {
     ) {
         List<League__c> lstLeagues = new List<League__c>();
         for (Integer i = 0; i < numLeagues; i++) {
-            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i), Sport__c = sport));
+            lstLeagues.add(new League__c(Name = 'Test League ' + String.valueOf(i)));
         }
         insert lstLeagues;
         List<League_Season__c> lstLeagueSeasons = new List<League_Season__c>();

@@ -1,9 +1,9 @@
 import { LightningElement, wire, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import { refreshApex } from '@salesforce/apex';
 import getLeagueSeasons from '@salesforce/apex/LeagueSeasonStandingsController.getLeagueSeasons';
 
-
-export default class ExternalLeagueStandingsComponent extends LightningElement {
+export default class ExternalLeagueStandingsComponent extends NavigationMixin(LightningElement) {
     @api showTeamLogos;
     @api sport;
     isLoading = false;
@@ -58,6 +58,20 @@ export default class ExternalLeagueStandingsComponent extends LightningElement {
     // COMBOBOX VALUE
     get selectedLeagueSeasonValue() {
         return this.selectedLeagueSeason;
+    }
+
+    handleGoToSeason() {
+        const leagueSeasonId = this.selectedLeagueSeason;
+
+        this[NavigationMixin.Navigate]({
+            type: 'standard__recordPage',
+            attributes: {
+                recordId: leagueSeasonId,
+                objectApiName: 'League_Season__c',
+                actionName: 'view'
+            }
+        });
+
     }
 
 }

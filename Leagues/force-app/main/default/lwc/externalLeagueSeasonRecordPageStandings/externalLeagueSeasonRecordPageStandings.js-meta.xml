@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>52.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Around the Leagues</masterLabel>
+    <masterLabel>League Season Record Page Standings</masterLabel>
     <targets>
         <target>lightningCommunity__Page</target>
         <target>lightningCommunity__Default</target>
@@ -14,10 +14,12 @@
                 name="showTeamLogos" 
                 type="Boolean" 
             />
-            <property 
-                label="Sport" 
-                name="sport" 
-                type="String" 
+            <property
+                name="recordId"
+                type="String"
+                label="Record Id"
+                description="Enter {!recordId} for the current record page"
+                default="{!recordId}" 
             />
         </targetConfig>
     </targetConfigs>
