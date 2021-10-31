@@ -66,7 +66,7 @@ public with sharing class LeagueGameEventSync {
         Map<Id, League_Game__c> mapOldGames,
         Map<Id, Team__c> mapTeams
     ) {
-        Set<Id> eventGameIds = new Set<Id>();
+        Map<Id, League_Game__c> mapChangedLeagueGames = new Map<Id, League_Game__c>();
         for(League_Game__c game : lstGames) {
             League_Game__c oldGame = mapOldGames.get(game.Id);
             if (
@@ -75,31 +75,26 @@ public with sharing class LeagueGameEventSync {
                 game.Game_Result__c != oldGame.Game_Result__c ||
                 game.Venue__c != oldGame.Venue__c
             ) {
-                eventGameIds.add(game.Id);
+                mapChangedLeagueGames.put(game.Id, game);
             }
         }
 
-        if (eventGameIds.isEmpty()) {
+        if (mapChangedLeagueGames.isEmpty()) {
             return;
         }
 
         List<Event> lstEvents = [
             SELECT Id, Subject, StartDateTime, EndDateTime, League_Game_ID__c 
               FROM Event 
-             WHERE League_Game_ID__c IN :eventGameIds 
+             WHERE League_Game_ID__c IN :mapChangedLeagueGames.keySet() 
               WITH SECURITY_ENFORCED
         ];
 
-        Map<Id, Event> mapEvents = new Map<Id, Event>();
-        for (Event event : lstEvents) {
-            mapEvents.put(event.League_Game_ID__c, event);
-        }
-
         List<Event> lstEventsToUpdate = new List<Event>();
-        for (League_Game__c lg : lstGames) {
+        for (Event ev : lstEvents) {
+            League_Game__c lg = mapChangedLeagueGames.get(ev.League_Game_ID__c);
             String strSubject = getEventSubjectFromGame(lg);
 
-            Event ev = mapEvents.get(lg.Id);
             ev.StartDateTime = lg.Game_Time__c;
             ev.EndDateTime   = lg.End_Time__c;
             ev.Subject       = strSubject;

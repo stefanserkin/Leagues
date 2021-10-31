@@ -1,0 +1,18 @@
+<template>
+    <lightning-spinner if:true={isLoading} alternative-text="Loading" variant="brand" size="large"></lightning-spinner>
+    <template if:false={isLoading}>
+        <lightning-card>
+            <template if:true={simulationComplete}>
+                <h1 slot="title">{simulationResult}</h1>
+            </template>
+            <template if:false={simulationComplete}>
+                <h1 slot="title">Simulate {leagueSeasonName}</h1>
+                <lightning-button 
+                    label="Run Simulation" 
+                    onclick={runSimulation}
+                    class="slds-var-m-around_medium"
+                ></lightning-button>
+            </template>
+        </lightning-card>
+    </template>
+</template>
